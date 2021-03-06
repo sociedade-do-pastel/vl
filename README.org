@@ -9,5 +9,43 @@
 #+exclude_tags: noexport
 #+creator: Emacs 27.1 (Org mode 9.4)
 
-* Documento de requisitos e diagrama de uso de caso
-  Ainda em construção
+* Membros
+   - *time do projeto*: Quando citado, se trata do grupo modelando o software
+    | Nome                     |         RA |
+    |--------------------------+------------|
+    | Leon Ferreira Bellini    | 22218002-8 |
+    | Guilherme Ormond Sampaio | 22218007-7 |
+
+* Documento de requisitos 
+
+** Requisitos de sistema
+   
+*** Funcionais
+    1. O usuário deve possuir cadastro num sistema tabelado, caso contrário,
+       este deve ser inscrito com número de CPF por um atendente qualquer e a
+       locação deverá ser interrompida temporariamente.
+       1. Se houver uma locação pendente, cancelar a transação 
+
+    2. Assim que atendido, o usuário deve apresentar todos os documentos
+       não opcionais e o sistema avaliará a veracidade dos documentos prestados
+       (OCR).
+	 
+    3. Terminada a avaliação, com o cadastro checado/criado, o usuário poderá,
+       então, escolher o veículo desejado a partir das categorias listadas em
+       tela. 
+       
+    4. Atendente "apropriado" deve ser escolhido pelo sistema baseado em seu
+       desempenho.
+
+    5. Pagamento deverá ser realizado a partir de cartão de crédito ou PIX,
+       as informações prestadas serão checadas no momento do pagamento. O sistema
+       deverá também informar, antes mesmo do pagamento, informações quanto a
+       aditivos, seguros e promoções.
+       - Se realizado /on-line/, o /software/ deve prover a opção de reserva de veículo
+	 com a devida taxa (2x)
+
+       - No caso do pagamento com PIX, uma nota promissória deve ser impressa após
+	 o pagamento (/on-line/) ou apresentada por um atendente.
+	 
+** Categorização de veículos
+   
