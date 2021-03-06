@@ -31,7 +31,7 @@
        (OCR).
 	 
     3. Terminada a avaliação, com o cadastro checado/criado, o usuário poderá,
-       então, escolher o veículo desejado a partir das categorias listadas em
+       então, escolher o veículo desejado a partir das categorias [[Categorização de veículos]] listadas em
        tela. 
        
     4. Atendente "apropriado" deve ser escolhido pelo sistema baseado em seu
@@ -41,11 +41,20 @@
        as informações prestadas serão checadas no momento do pagamento. O sistema
        deverá também informar, antes mesmo do pagamento, informações quanto a
        aditivos, seguros e promoções.
-       - Se realizado /on-line/, o /software/ deve prover a opção de reserva de veículo
-	 com a devida taxa (2x)
+       - Se realizado /on-line/, o /software/ deve prover a opção de reserva de veículo com a devida taxa (2x)
 
-       - No caso do pagamento com PIX, uma nota promissória deve ser impressa após
-	 o pagamento (/on-line/) ou apresentada por um atendente.
+       - No caso do pagamento com PIX, uma nota promissória deve ser impressa após o pagamento (/on-line/) ou apresentada por um atendente.
 	 
-** Categorização de veículos
-   
+* Categorização de veículos
+  | Categoria     | Código |
+  |---------------+--------|
+  | Econômico     | EC     |
+  | SUV           | SV     |
+  | Mid-range     | MR     |
+  | VAN           | VN     |
+  | Esportivo     | ES     |
+  | Luxo compacto | LC     |
+  | Limousine     | LI     |
+
+
+
