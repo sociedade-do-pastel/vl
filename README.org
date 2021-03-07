@@ -11,10 +11,12 @@
 
 * Membros
    - *time do projeto*: Quando citado, se trata do grupo modelando o software
-    | Nome                     |         RA |
-    |--------------------------+------------|
-    | Leon Ferreira Bellini    | 22218002-8 |
-    | Guilherme Ormond Sampaio | 22218007-7 |
+     |--------------------------+------------|
+     | Nome                     |         RA |
+     |--------------------------+------------|
+     | Leon Ferreira Bellini    | 22218002-8 |
+     | Guilherme Ormond Sampaio | 22218007-7 |
+     |--------------------------+------------|
 
 * Documento de requisitos 
 
@@ -31,8 +33,7 @@
        (OCR).
 	 
     3. Terminada a avaliação, com o cadastro checado/criado, o usuário poderá,
-       então, escolher o veículo desejado a partir das categorias [[Categorização de veículos]] listadas em
-       tela. 
+       então, escolher o veículo desejado a partir das categorias [[Categorização de veículos]] listadas em tela. 
        
     4. Atendente "apropriado" deve ser escolhido pelo sistema baseado em seu
        desempenho.
@@ -46,15 +47,17 @@
        - No caso do pagamento com PIX, uma nota promissória deve ser impressa após o pagamento (/on-line/) ou apresentada por um atendente.
 	 
 * Categorização de veículos
-  | Categoria     | Código |
-  |---------------+--------|
-  | Econômico     | EC     |
-  | SUV           | SV     |
-  | Mid-range     | MR     |
-  | VAN           | VN     |
-  | Esportivo     | ES     |
-  | Luxo compacto | LC     |
-  | Limousine     | LI     |
+|---------------+--------|
+| Categoria     | Código |
+|---------------+--------|
+| Econômico     | EC     |
+| SUV           | SV     |
+| Mid-range     | MR     |
+| VAN           | VN     |
+| Esportivo     | ES     |
+| Luxo compacto | LC     |
+| Limousine     | LI     |
+|---------------+--------|
 
 
 

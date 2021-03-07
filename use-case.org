@@ -1,0 +1,60 @@
+#+title: Diagrama de casos de uso
+#+options: toc:nil date:nil
+#+startup: latexpreview
+#+attr_latex: \usepackage[table,xcdraw]{xcolor}
+#+attr_latex: \usepackage{float}
+#+attr_latex: \restylefloat{table}
+
+# * Requisitos
+# ** Funcionais
+# \begin{table}[H]
+# \begin{tabular}{|l|l|l|}
+# \hline
+# {\color[HTML]{3166FF} Identificação:} & \multicolumn{2}{l|}{{\color[HTML]{3166FF} Nome:}} \\ \hline
+#                                       & \multicolumn{2}{l|}{}                             \\ \hline
+# \multicolumn{3}{|l|}{{\color[HTML]{3166FF} Descrição:}}                                    \\ \hline
+# \multicolumn{3}{|l|}{}                                                                    \\ \hline
+# ( ) Essencial                             & ( ) Importante               & ( ) Desejável  \\ \hline
+# \end{tabular}
+# \end{table}
+# ** Não-funcionais
+
+
+* Diagrama de caso de uso
+#+begin_src plantuml :file images/caso_de_uso.png
+  left to right direction
+  skinparam packageStyle rectangle
+
+  actor cliente
+  actor atendente
+  :atendente do portal: as atPortal
+  atPortal <|-- atendente
+  :time do pátio: as patime
+  :cliente cadastrado: as cladastrado
+  cladastrado <|-left- cliente
+
+  rectangle "Locadora VL" {
+      atendente -- (autenticação)
+      (autenticação) -- cliente
+      atendente -- (cadastro)
+      (cadastro) -- cliente
+      (validação dos documentos) -- cliente
+      (seleção de veículo) -- cliente
+      (pagamento) -- cliente
+      (pagamento) <|-up- (pagamento com PIX)
+      (pagamento) <|-up- (pagamento com cartão de crédito)
+      (pagamento com PIX) .> (gerar nota promissória) : <<include>>
+      patime -- (liberação do veículo)
+      patime -- (coleta do veículo)
+      (cadastro) .> (autenticação)  : <<extend>>
+      atendente -- (categorização de atendente)
+      atendente -- (verificação de pendências)
+      (pagamento) .> (verificar promoção) : <<include>>
+      atPortal -- (locação online)
+      (locação online) -- cladastrado
+      patime -- (locação online)
+  }
+#+end_src
+
+#+RESULTS:
+[[file:images/caso_de_uso.png]]
