@@ -5,42 +5,27 @@
 #+attr_latex: \usepackage{float}
 #+attr_latex: \restylefloat{table}
 
-# * Requisitos
-# ** Funcionais
-# \begin{table}[H]
-# \begin{tabular}{|l|l|l|}
-# \hline
-# {\color[HTML]{3166FF} Identificação:} & \multicolumn{2}{l|}{{\color[HTML]{3166FF} Nome:}} \\ \hline
-#                                       & \multicolumn{2}{l|}{}                             \\ \hline
-# \multicolumn{3}{|l|}{{\color[HTML]{3166FF} Descrição:}}                                    \\ \hline
-# \multicolumn{3}{|l|}{}                                                                    \\ \hline
-# ( ) Essencial                             & ( ) Importante               & ( ) Desejável  \\ \hline
-# \end{tabular}
-# \end{table}
-# ** Não-funcionais
-
-
 * Diagrama de caso de uso
 #+begin_src plantuml :file images/caso_de_uso.png
   left to right direction
   skinparam packageStyle rectangle
 
-  actor cliente
+  :cliente não-autenticado: as cliente
   actor atendente
   :atendente do portal: as atPortal
   atPortal <|-- atendente
   :time do pátio: as patime
-  :cliente cadastrado: as cladastrado
-  cladastrado <|-left- cliente
+  :cliente autenticado: as cladastrado
+  cladastrado <|-- cliente
 
   rectangle "Locadora VL" {
       atendente -- (autenticação)
       (autenticação) -- cliente
       atendente -- (cadastro)
       (cadastro) -- cliente
-      (validação dos documentos) -- cliente
-      (seleção de veículo) -- cliente
-      (pagamento) -- cliente
+      (validação dos documentos) -- cladastrado
+      (seleção de veículo) -- cladastrado
+      (pagamento) -- cladastrado
       (pagamento) <|-up- (pagamento com PIX)
       (pagamento) <|-up- (pagamento com cartão de crédito)
       (pagamento com PIX) .> (gerar nota promissória) : <<include>>
