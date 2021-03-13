@@ -21,27 +21,25 @@
   atPortal <|-- atendente
   :time do pátio: as patime
   :cliente autenticado: as cladastrado
-  cladastrado <|-- cliente
 
   rectangle "Locadora VL" {
-      atendente -- (autenticação)
       (autenticação) -- cliente
       atendente -- (cadastro)
       (cadastro) -- cliente
+      atendente -- (validação dos documentos)
       (validação dos documentos) -- cladastrado
-      (seleção de veículo) -- cladastrado
-      (pagamento) -- cladastrado
       (cadastro) .> (autenticação)  : <<extend>>
       atendente -- (categorização de atendente)
       atendente -- (verificação de pendências)
       atPortal -- (locação online)
       (locação online) -- cladastrado
       patime -- (locação online)
-      atendente -- (pagamento)
-      patime -- (coleta do veículo)
-      (coleta do veículo) -- cladastrado
       patime -- (liberação do veículo)
       (liberação do veículo) -- cladastrado
+      patime -- (coleta do veículo)
+      (coleta do veículo) -right- cliente
+      atendente -- (locação presencial)
+      (locação presencial) -- cladastrado
   }
 #+end_src
 
@@ -51,24 +49,23 @@
 * Fluxos
 ** Autenticação
 #+ATTR_LaTeX: align=|c|c|c|
-|-----------------+---------------------------------------------------|
-| Identificação:  | UC01                                              |
-|-----------------+---------------------------------------------------|
-| Função          | Autenticação no sistema eletrônico                |
-|-----------------+---------------------------------------------------|
-| Atores:         | Atendente                                         |
-|                 | Cliente não-autenticado                           |
-|-----------------+---------------------------------------------------|
-| Prioridade:     | Essencial                                         |
-|-----------------+---------------------------------------------------|
-| Pré-condição:   | Ter um cadastro                                   |
-|                 | Atendente selecionado para o cliente              |
-|-----------------+---------------------------------------------------|
-| Pós-condição:   | Cliente pode prosseguir com o aluguel             |
-|-----------------+---------------------------------------------------|
-| Fluxo principal | \bullet Cliente informa suas credenciais          |
-|                 | \bullet Credenciais são aceitas \left[FS01\right] |
-|-----------------+---------------------------------------------------|
+|-----------------+--------------------------------------------------------|
+| Identificação:  | UC01                                                   |
+|-----------------+--------------------------------------------------------|
+| Função          | Autenticação no sistema eletrônico                     |
+|-----------------+--------------------------------------------------------|
+| Atores:         | Cliente não-autenticado                                |
+|-----------------+--------------------------------------------------------|
+| Prioridade:     | Essencial                                              |
+|-----------------+--------------------------------------------------------|
+| Pré-condição:   | Ter um cadastro                                        |
+|                 | Atendente selecionado para o cliente                   |
+|-----------------+--------------------------------------------------------|
+| Pós-condição:   | Cliente pode prosseguir com o aluguel                  |
+|-----------------+--------------------------------------------------------|
+| Fluxo principal | \bullet Cliente insere suas credenciais em um terminal |
+|                 | \bullet Credenciais são aceitas \left[FS01\right]      |
+|-----------------+--------------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+------------------------------------|
@@ -79,26 +76,35 @@
 
 ** Cadastro
 #+ATTR_LaTeX: align=|c|c|c|
-|-----------------+---------------------------------------------|
-| Identificação:  | UC02                                        |
-|-----------------+---------------------------------------------|
-| Função          | Registrar o cliente no sistema              |
-|-----------------+---------------------------------------------|
-| Atores:         | Atendente                                   |
-|                 | Cliente não-autenticado                     |
-|-----------------+---------------------------------------------|
-| Prioridade:     | Essencial                                   |
-|-----------------+---------------------------------------------|
-| Pré-condição:   | Nenhuma                                     |
-|-----------------+---------------------------------------------|
-| Pós-condição:   | Cliente pode prosseguir para a autenticação |
-|-----------------+---------------------------------------------|
-| Fluxo principal | \bullet Cliente informa seu nome            |
-|                 | \bullet Cliente informa seu CPF             |
-|                 | \bullet Cliente informa o número de sua CNH |
-|                 | \bullet Cliente informa uma senha           |
-|                 | \bullet Cliente confere as informações      |
-|-----------------+---------------------------------------------|
+|-----------------+--------------------------------------------------------------|
+| Identificação:  | UC02                                                         |
+|-----------------+--------------------------------------------------------------|
+| Função          | Registrar o cliente no sistema                               |
+|-----------------+--------------------------------------------------------------|
+| Atores:         | Atendente                                                    |
+|                 | Cliente não-autenticado                                      |
+|-----------------+--------------------------------------------------------------|
+| Prioridade:     | Essencial                                                    |
+|-----------------+--------------------------------------------------------------|
+| Pré-condição:   | Nenhuma                                                      |
+|-----------------+--------------------------------------------------------------|
+| Pós-condição:   | Cliente pode prosseguir para a autenticação                  |
+|-----------------+--------------------------------------------------------------|
+| Fluxo principal | \bullet Cliente não possui cadastro \left[FS02\right]        |
+|                 | \bullet Cliente informa seu nome para o atendente            |
+|                 | \bullet Cliente informa seu CPF para o atendente             |
+|                 | \bullet Cliente informa o número de sua CNH para o atendente |
+|                 | \bullet Cliente insere sua senha diretamente no numpad       |
+|                 | \bullet Cliente confere as informações                       |
+|-----------------+--------------------------------------------------------------|
+
+#+ATTR_LaTeX: align=|c|c|c|
+|-------------------+------------------------------------------|
+| Fluxo             | \bullet Cliente já possui cadastro       |
+| secundário        | \bullet Cliente prossegue para validação |
+| \left[FS02\right] |                                          |
+|-------------------+------------------------------------------|
+
 ** Validação de documentos
 #+ATTR_LaTeX: align=|c|c|c|
 |-----------------+-----------------------------------------------------------|
@@ -106,7 +112,8 @@
 |-----------------+-----------------------------------------------------------|
 | Função          | Verificar a veracidade e validade dos documentos pelo OCR |
 |-----------------+-----------------------------------------------------------|
-| Atores:         | Cliente                                                   |
+| Atores:         | Cliente autenticado                                       |
+|                 | Atendente                                                 |
 |-----------------+-----------------------------------------------------------|
 | Prioridade:     | Essencial                                                 |
 |-----------------+-----------------------------------------------------------|
@@ -114,15 +121,16 @@
 |-----------------+-----------------------------------------------------------|
 | Pós-condição:   | Cliente pode prosseguir para seleção do veículo           |
 |-----------------+-----------------------------------------------------------|
-| Fluxo principal | \bullet Insere os documentos exigidos pelo sistema        |
-|                 | \bullet Os ducumentos estão em dia \left[FS02\right]      |
+| Fluxo principal | \bullet Cliente cede os documentos requeridos pelo        |
+|                 | atendente                                                 |
+|                 | \bullet Os ducumentos estão em dia \left[FS03\right]      |
 |-----------------+-----------------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+------------------------------------------|
 | Fluxo             | \bullet Documentos inválidos             |
 | secundário        | \bullet Cliente é impedido de prosseguir |
-| \left[FS02\right] |                                          |
+| \left[FS03\right] |                                          |
 |-------------------+------------------------------------------|
 
 ** Verificação de pendências
@@ -142,101 +150,83 @@
 | Pós-condição:   | Cliente pode prosseguir para seleção veículo                |
 |-----------------+-------------------------------------------------------------|
 | Fluxo principal | \bullet Atendente checa o histórico do cliente              |
-|                 | \bullet Atendente não encontra pendências \left[FS03\right] |
+|                 | \bullet Atendente não encontra pendências \left[FS04\right] |
 |-----------------+-------------------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+------------------------------------------|
 | Fluxo             | \bullet Cliente possui pendências        |
 | secundário        | \bullet Cliente é impedido de prosseguir |
-| \left[FS03\right] |                                          |
+| \left[FS04\right] |                                          |
 |-------------------+------------------------------------------|
-** Seleção de veículo
-#+ATTR_LaTeX: :align=|c|c|c|
+** Locação presencial
 |-----------------+----------------------------------------------------------------------|
 | Identificação:  | UC05                                                                 |
 |-----------------+----------------------------------------------------------------------|
-| Função          | Selecionar qual veículo será alugado                                 |
+| Função          | Realizar o aluguel em uma unidade física                             |
 |-----------------+----------------------------------------------------------------------|
-| Atores:         | Cliente autenticado                                                  |
+| Atores:         | Atendente                                                            |
+|                 | Cliente autenticado                                                  |
 |-----------------+----------------------------------------------------------------------|
 | Prioridade:     | Essencial                                                            |
 |-----------------+----------------------------------------------------------------------|
 | Pré-condição:   | Cliente não possui pendências                                        |
 |                 | Documentos do cliente são válidos                                    |
 |-----------------+----------------------------------------------------------------------|
-| Pós-condição:   | Cliente segue para o pagamento                                       |
+| Pós-condição:   | Cliente retira o veículo                                             |
 |-----------------+----------------------------------------------------------------------|
 | Fluxo principal | \bullet Cliente verifica lista de categorias de veículos disponíveis |
-|                 | \bullet Cliente seleciona categoria desejada \left[FS04\right]       |
+|                 | \bullet Cliente seleciona categoria desejada \left[FS05\right]       |
+|                 | \bullet Atendente verifica se cliente é elegível para promoções      |
+|                 | \left[FS06\right] \left[FS07\right] \left[FS08\right]                |
+|                 | \bullet Cliente seleciona método de pagamento                        |
+|                 | \bullet Cliente escolhe pagamento por cartão \left[FS10\right]       |
+|                 | \bullet Cliente insere o cartão                                      |
+|                 | \bullet Cliente digita senha                                         |
+|                 | \bullet Pagamento é aprovado \left[FS11\right]                       |
+|                 | \bullet Nota fiscal é gerada                                         |
 |-----------------+----------------------------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+---------------------------------------------|
 | Fluxo             | \bullet Categoria não disponível            |
 | secundário        | \bullet Cliente recebe upgrade de categoria |
-| \left[FS04\right] |                                             |
+| \left[FS05\right] |                                             |
 |-------------------+---------------------------------------------|
-
-** Pagamento
-#+ATTR_LaTeX: :align=|c|c|c|
-|-----------------+-----------------------------------------------------------------|
-| Identificação:  | UC06                                                            |
-|-----------------+-----------------------------------------------------------------|
-| Função          | Escolha e realização do método de pagamento                     |
-|-----------------+-----------------------------------------------------------------|
-| Atores:         | Cliente autenticado                                             |
-|                 | Atendente                                                       |
-|-----------------+-----------------------------------------------------------------|
-| Prioridade:     | Essencial                                                       |
-|-----------------+-----------------------------------------------------------------|
-| Pré-condição:   | Veículo selecionado                                             |
-|-----------------+-----------------------------------------------------------------|
-| Pós-condição:   | Cliente segue para a coleta do veículo                          |
-|-----------------+-----------------------------------------------------------------|
-| Fluxo principal | \bullet Atendente verifica se cliente é elegível para promoções |
-|                 | \left[FS05\right] \left[FS06\right] \left[FS07\right]           |
-|                 | \bullet Cliente seleciona método de pagamento                   |
-|                 | \bullet Cliente escolhe pagamento por cartão \left[FS09\right]  |
-|                 | \bullet Cliente insere o cartão                                 |
-|                 | \bullet Cliente digita senha                                    |
-|                 | \bullet Pagamento é aprovado \left[FS10\right]                  |
-|                 | \bullet Nota fiscal é gerada                                    |
-|-----------------+-----------------------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+------------------------------------------------|
 | Fluxo             | \bullet Prazo do aluguel é mensal ou quinzenal |
 | secundário        | \bullet Cliente recebe desconto de 6%          |
-| \left[FS05\right] |                                                |
+| \left[FS06\right] |                                                |
 |-------------------+------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+---------------------------------------------------|
 | Fluxo             | \bullet Cliente está no top 10 de clientes do mês |
 | secundário        | \bullet Cliente recebe desconto de 12.5%          |
-| \left[FS06\right] |                                                   |
+| \left[FS07\right] |                                                   |
 |-------------------+---------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+-------------------------------------------------------------------|
 | Fluxo             | \bullet Cliente é fidelizado ou aniversariante                    |
-| secundário        | \bullet Cliente não recebeu upgrade previamente \left[FS08\right] |
-| \left[FS07\right] | \bullet Cliente recebe upgrade de categoria de veículo            |
+| secundário        | \bullet Cliente não recebeu upgrade previamente \left[FS09\right] |
+| \left[FS08\right] | \bullet Cliente recebe upgrade de categoria de veículo            |
 |-------------------+-------------------------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+------------------------------------------------|
 | Fluxo             | \bullet Cliente já recebeu upgrade previamente |
 | secundário        | \bullet Cliente não recebe outro upgrade       |
-| \left[FS08\right] |                                                |
+| \left[FS9\right]  |                                                |
 |-------------------+------------------------------------------------|
 
 #+ATTR_LaTeX: align=|c|c|c|
 |-------------------+------------------------------------------------------------|
 | Fluxo             | \bullet Cliente escolhe pagamento por PIX                  |
 | secundário        | \bullet Cliente lê código QR                               |
-| \left[FS09\right] | \bullet Cliente confirma a transferência \left[FS10\right] |
+| \left[FS10\right] | \bullet Cliente confirma a transferência \left[FS11\right] |
 |                   | \bullet Gerada nota promissória                            |
 |-------------------+------------------------------------------------------------|
 
@@ -244,12 +234,12 @@
 |-------------------+--------------------------------------------------------|
 | Fluxo             | \bullet Pagamento é reprovado                          |
 | secundário        | \bullet Cliente é impedido de prosseguir com o aluguel |
-| \left[FS10\right] |                                                        |
+| \left[FS11\right] |                                                        |
 |-------------------+--------------------------------------------------------|
 
 ** Liberação do veículo
 |-----------------+--------------------------------------------------------|
-| Identificação:  | UC07                                                   |
+| Identificação:  | UC06                                                   |
 |-----------------+--------------------------------------------------------|
 | Função          | Permitir a coleta do veículo pelo cliente              |
 |-----------------+--------------------------------------------------------|
@@ -268,12 +258,12 @@
 |-----------------+--------------------------------------------------------|
 ** Coleta do veículo
 |------------------+-----------------------------------------------------------------------|
-| Identificação:   | UC08                                                                  |
+| Identificação:   | UC07                                                                  |
 |------------------+-----------------------------------------------------------------------|
 | Função:          | Recebimento do veículo após encerramento do aluguel                   |
 |------------------+-----------------------------------------------------------------------|
 | Atores:          | Time do pátio                                                         |
-|                  | Cliente autenticado                                                   |
+|                  | Cliente não-autenticado                                               |
 |------------------+-----------------------------------------------------------------------|
 | Prioridade:      | Essencial                                                             |
 |------------------+-----------------------------------------------------------------------|
@@ -282,17 +272,25 @@
 | Pós-condição:    | Nenhuma                                                               |
 |------------------+-----------------------------------------------------------------------|
 | Fluxo principal: | \bullet Time do pátio aborda cliente                                  |
-|                  | \bullet Time do pátio verifica condições do veículo \left[FS07\right] |
-|                  | \bullet Time do pátio verifica presença de pertences no veículo       |
+|                  | \bullet Time do pátio verifica condições do veículo \left[FS12\right] |
+|                  | \bullet Time do pátio não encontra pertences no veículo               |
+|                  | \left[FS13\right]                                                     |
+|                  | \bullet Time do pátio estaciona o veículo na garagem                  |
 |                  | \bullet Time do pátio registra recebimento e encerramento             |
-|                  | \bullet Time do pátio manobra o veículo                               |
 |------------------+-----------------------------------------------------------------------|
 
 |-------------------+-------------------------------------|
 | Fluxo             | \bullet Veículo em más condições    |
 | secundário        | \bullet Time do pátio aciona seguro |
-| \left[FS11\right] |                                     |
+| \left[FS12\right] |                                     |
 |-------------------+-------------------------------------|
+
+|-------------------+-----------------------------------------------------|
+| Fluxo             | \bullet Time do pátio encontra pertencer no veículo |
+| secundário        | \bullet Pertences são devolvidos ao cliente         |
+| \left[FS13\right] |                                                     |
+|-------------------+-----------------------------------------------------|
+
 
 ** Locação online
 |-----------------+-------------------------------------------------------------------|
@@ -311,11 +309,11 @@
 | Pós-condição:   | Retirada do veículo                                               |
 |-----------------+-------------------------------------------------------------------|
 | Fluxo principal | \bullet Cliente se autentica no portal                            |
-|                 | \bullet Atendente do portal verifica documentos \left[FS02\right] |
-|                 | \bullet Atendente do portal verifica pendências \left[FS03\right] |
-|                 | \bullet Cliente seleciona categoria de veículo \left[FS04\right]  |
+|                 | \bullet Atendente do portal verifica documentos \left[FS03\right] |
+|                 | \bullet Atendente do portal verifica pendências \left[FS04\right] |
+|                 | \bullet Cliente seleciona categoria de veículo \left[FS05\right]  |
 |                 | \bullet Portal verifica se cliente é elegível para promoções      |
-|                 | \left[FS05\right] \left[FS06\right] \left[FS07\right]             |
+|                 | \left[FS06\right] \left[FS07\right] \left[FS08\right]             |
 |                 | \bullet Cliente realiza pagamento por API                         |
 |                 | \bullet Time do pátio é notificado do agendamento                 |
 |-----------------+-------------------------------------------------------------------|
@@ -334,12 +332,12 @@
 | Pós-condição:   | Atender o cliente                                                   |
 |-----------------+---------------------------------------------------------------------|
 | Fluxo principal | \bullet Atendente verifica histórico de aluguéis do cliente         |
-|                 | \bullet Cliente possui valores de aluguéis baixos \left[FS12\right] |
+|                 | \bullet Cliente possui valores de aluguéis baixos \left[FS14\right] |
 |                 | \bullet É atribuído um atendente de menor desempenho em vendas      |
 |-----------------+---------------------------------------------------------------------|
 
 |-------------------+-------------------------------------------------------------------------|
 | Fluxo             | \bullet Cliente possui valores de aluguéis altos                        |
 | secundário        | \bullet É atribuído um atendente de desempenho aceitável aleatoriamente |
-| \left[FS12\right] |                                                                         |
+| \left[FS14\right] |                                                                         |
 |-------------------+-------------------------------------------------------------------------|
