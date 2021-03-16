@@ -1,0 +1,91 @@
+#+title: Diagrama de classes
+#+options: toc:nil date:nil author:nil
+#+startup: latexpreview
+#+latex_header: \usepackage[table,xcdraw]{xcolor}
+#+latex_header: \usepackage{float}
+#+latex_header: \usepackage[right=3cm, top=3cm, left=3cm, left=3cm]{geometry}
+#+latex_header: \usepackage[brazilian]{babel}
+#+attr_latex: \restylefloat{table}
+
+* Integrantes
+
+\bullet Leon Ferreira Bellini (RA: 22.218.002-8) \\
+\bullet Guilherme Ormond Sampaio (RA: 22.218.007-7)
+
+* Diagrama
+
+#+begin_src plantuml :file images/class_diagram.png
+  scale 1.5
+  skinparam roundcorner 20
+  skinparam classAttributeIconSize 12
+  skinparam defaultFontSize 16
+  skinparam defaultFontName Hack
+  hide circle
+
+  class "**Cliente**" as Cliente
+  class "**Carro**" as Carro
+  class "**Patio**" as Patio
+  class "**Funcionario**" as Funcionario
+  class "**Atendente**" as Atendente
+  class "**FuncPatio**" as FuncPatio
+  class "**HistoricoAtendimentos**" as HistoricoAtendimentos
+  class "**Atendimento**" as Atendimento
+
+  class Cliente {
+        -id : string
+        -nome : string
+        -telefone : string
+        -num_cnh : string
+  }
+  class Carro {
+        -id : string
+        -modelo : string
+        -ano : string
+        -categoria : int
+        -alugado : bool
+  }
+  class Patio {
+        -qt_vagas : int
+        -qt_vagas_ocupadas : int
+  }
+  class Funcionario {
+        -nome : string
+        -id : string
+        -senha : string
+        -telefone : string
+        -cpf : string
+        -inic_periodo : timestamp
+        -fim_periodo : timestamp
+  }
+  class Atendente {
+        -portal : bool
+  }
+  class FuncPatio {
+        -num_cnh : string
+        -categoria_cnh : int
+  }
+  class HistoricoAtendimentos {
+        -qt_atendimentos : int
+        -valor_vendas : float
+  }
+  class Atendimento {
+        -valor : float
+        -id_atendente : string
+        -id_cliente : string
+        -id_carro : string 
+        -horario : timestamp
+  }
+
+  Patio "1..1" o-down- "0..*" Carro : contém
+  Patio "1..1" o-right- "1..*" FuncPatio : contém
+  Funcionario <|-- Atendente
+  Funcionario <|-- FuncPatio
+  Atendente .. Cliente : atende
+  Cliente .right. Atendimento : participa
+  Carro .right. Cliente : aluga
+  Atendente "1..1" *-right- "1..1" HistoricoAtendimentos : possui
+  HistoricoAtendimentos "1..1" *-down- "0..*" Atendimento : contém
+#+end_src
+
+#+RESULTS:
+[[file:images/class_diagram.png]]
