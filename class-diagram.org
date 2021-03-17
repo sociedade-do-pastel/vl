@@ -23,7 +23,7 @@
   hide circle
 
   class "**Cliente**" as Cliente
-  class "**Carro**" as Carro
+  class "**Veiculo**" as Veiculo
   class "**Patio**" as Patio
   class "**Funcionario**" as Funcionario
   class "**Atendente**" as Atendente
@@ -34,10 +34,14 @@
   class Cliente {
         -id : string
         -nome : string
+        -cpf : string
         -telefone : string
         -num_cnh : string
+        -data_nasc : timestamp
+        +verificar_promocoes() : string
+        +verificar_pendencias() : bool
   }
-  class Carro {
+  class Veiculo {
         -id : string
         -modelo : string
         -ano : string
@@ -47,6 +51,10 @@
   class Patio {
         -qt_vagas : int
         -qt_vagas_ocupadas : int
+        +adicionar_veiculo() : bool
+        +remover_veiculo() : bool
+        +listar_veiculos() : string
+        +verificar_disp() : bool
   }
   class Funcionario {
         -nome : string
@@ -56,9 +64,11 @@
         -cpf : string
         -inic_periodo : timestamp
         -fim_periodo : timestamp
+        +bater_ponto() : void
   }
   class Atendente {
         -portal : bool
+        +calcular_rendimento() : float
   }
   class FuncPatio {
         -num_cnh : string
@@ -67,22 +77,26 @@
   class HistoricoAtendimentos {
         -qt_atendimentos : int
         -valor_vendas : float
+        +adicionar_atendimento() : bool
   }
   class Atendimento {
         -valor : float
         -id_atendente : string
         -id_cliente : string
-        -id_carro : string 
-        -horario : timestamp
+        -id_veiculo : string 
+        -horario_coleta : timestamp
+        -horario_devolucao: timestamp
+        -em_andamento : bool
+        +calcular_valor() : float
   }
 
-  Patio "1..1" o-down- "0..*" Carro : contém
-  Patio "1..1" o-right- "1..*" FuncPatio : contém
+  Patio "1..1" o-down- "0..*" Veiculo : contém
+  Patio .right. FuncPatio : trabalha
   Funcionario <|-- Atendente
   Funcionario <|-- FuncPatio
   Atendente .. Cliente : atende
   Cliente .right. Atendimento : participa
-  Carro .right. Cliente : aluga
+  Veiculo .right. Cliente : aluga
   Atendente "1..1" *-right- "1..1" HistoricoAtendimentos : possui
   HistoricoAtendimentos "1..1" *-down- "0..*" Atendimento : contém
 #+end_src
