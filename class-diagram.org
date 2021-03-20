@@ -118,7 +118,7 @@
 
 ** Veiculo
    Um veículo com =id= único, =modelo= (/string/ informando modelo mais sua marca),
-   =ano= de fabricação, =categoria= dentre as listadas no [[./README.org][README]] do projeto e se
+   =ano= de fabricação, =categoria= dentre as listadas no [[https://github.com/sociedade-do-pastel/vl][README]] do projeto e se
    este está =alugado= ou não. O método de =Patio=, =verificar_disp= testaria
    sobre este valor "booleano". 
 
