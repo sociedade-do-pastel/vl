@@ -1,0 +1,11 @@
+#+title: Relatório parcial - VL Aluguéis
+#+options: toc:nil date:nil author:nil
+#+startup: latexpreview
+#+latex_header: \author{{Leon Ferreira Bellini} \\ {\small 22.218.002-8} \and Guilherme Ormond Sampaio \\ {\small 22.218.007-7}}
+#+latex_header: \usepackage{float}
+#+attr_latex: \restylefloat{table}
+
+
+#+include: ../use-case.org
+
+#+include: ../class-diagram.org

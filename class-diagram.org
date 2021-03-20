@@ -1,17 +1,3 @@
-#+title: Diagrama de classes
-#+options: toc:nil date:nil author:nil
-#+startup: latexpreview
-#+latex_header: \usepackage[table,xcdraw]{xcolor}
-#+latex_header: \usepackage{float}
-#+latex_header: \usepackage[right=3cm, top=3cm, left=3cm, left=3cm]{geometry}
-#+latex_header: \usepackage[brazilian]{babel}
-#+attr_latex: \restylefloat{table}
-
-* Integrantes
-
-\bullet Leon Ferreira Bellini (RA: 22.218.002-8) \\
-\bullet Guilherme Ormond Sampaio (RA: 22.218.007-7)
-
 * Diagrama
 
 #+begin_src plantuml :file images/class_diagram.png
@@ -103,3 +89,64 @@
 
 #+RESULTS:
 [[file:images/class_diagram.png]]
+
+
+* Classes
+   
+** Patio
+   Representando o pátio de veículos da empresa, a classe tem como membro
+   a variável =qt_vagas=, sendo esta a quantidade total de vagas físicas do pátio,
+   definida por um /setter/ qualquer e podendo ser modificada caso ocorra a
+   indisponibilidade temporária de uma vaga ou a construção de novos locais.
+   Além disso, o membro =qt_vagas_ocupadas= determina as vagas ocupadas por veículos
+   no momento da consulta.
+   
+*** Métodos
+    - =adiciona_veiculo=: Adiciona um novo objeto da classe veículo adquirido pela empresa 
+    - =remover_veiculo=: Caso ocorra a eventualidade da perda ou venda de um veículo,
+      permite que este seja removido da lista de veículos
+    - =listar_veiculos=: Lista todos os veículos presentes na estrutura lista
+    - =verificar_disp=: Lista todos os veículos ainda não alugados
+
+** Cliente
+   Após registrar-se no sistema, o =Cliente= passa a "existir" no sistema,
+   este é composto de um =id=, =nome= (completo), =cpf=, =telefone= para contato,
+   =num_cnh= e =data_nasc= a qual pode influir sobre a checagem de promoções
+   a qual ocorre no método =verificar_promocoes=. Por outro lado,
+   =verificar_pendencias= baseia-se nos valores registrados no histórico de
+   atendimentos. 
+
+** Veiculo
+   Um veículo com =id= único, =modelo= (/string/ informando modelo mais sua marca),
+   =ano= de fabricação, =categoria= dentre as listadas no [[./README.org][README]] do projeto e se
+   este está =alugado= ou não. O método de =Patio=, =verificar_disp= testaria
+   sobre este valor "booleano". 
+
+** Funcionario
+   Classe que representa um funcionário qualquer da empresa com =nome=, =id=, =senha=
+   para acesso do sistema, =telefone= para contato, =cpf= para seu registro, =inic_periodo=
+   e =fim_periodo= controlados pelo método =bater_ponto=. O sistema realiza checagens
+   se tal funcionário começou seu turno atrasado. 
+   
+** FuncPatio
+   Simboliza um funcionário do pátio, cuja classe mãe seria =Funcionario=. Este
+   funcionário é registrado com sua habilitação e a categoria (B, C ou BC ) desta.
+
+   
+** Atendente
+   Atendente, cuja superclasse é Funcionário, tem um valor =portal= que representa
+   se este mantém o portal /online/ ou não.
+
+** HistoricoAtendimentos
+   Existe para cada =Atendente=, este histórico lista a =qt_atendimentos=
+   e =valor_vendas=, possibilitando o cálculo do desempenho do =Atendente=
+   em foco rapidamente. 
+   
+** Atendimento
+   Possuindo um =valor= para o aluguel calculado pelo método =calcular_valor= e
+   influenciado pela categoria do veículo e promoções calculadas para o cliente
+   em questão, a classe =Atendimento= também lista o =id_veiculo= do
+   veículo escolhido, bem como o =horario_coleta= pelo cliente e =horario_devolucao=,
+   bem como um indicador =em_andamento=, que tem importância na determinação de
+   pendências.    
+
