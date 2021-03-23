@@ -1,0 +1,25 @@
+#+begin_src plantuml :file ./images/sequence_diagram.png
+  ' Configurações
+  scale 1.5
+  skinparam roundcorner 20
+  skinparam classAttributeIconSize 12
+  skinparam defaultFontSize 16
+  skinparam defaultFontName Hack
+
+  ' Ordens de entidades
+  actor Atendente
+  boundary Aplicação_Atendente as apendente
+  participant Cliente
+  boundary Aplicação_Cliente as apliente
+  actor Cliente as clator
+
+  ' Conexões
+  Atendente -> apendente: Insere dados
+  apendente -> Cliente: Cliente(nome,cadastro,cpf,cnh,data_nasc,tel)
+  deactivate Cliente
+  apliente <- clator: Cliente digita a senha
+  Cliente <- apliente: setSenha(senha)
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram.png]]
