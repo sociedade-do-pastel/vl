@@ -1,25 +1,480 @@
-#+begin_src plantuml :file ./images/sequence_diagram.png
+#+name: plantConfig
+#+begin_src plantuml
   ' Configurações
-  scale 1.5
-  skinparam roundcorner 20
-  skinparam classAttributeIconSize 12
-  skinparam defaultFontSize 16
-  skinparam defaultFontName Hack
+    scale 1.5
+    skinparam roundcorner 20
+    skinparam classAttributeIconSize 12
+    skinparam defaultFontSize 16
+    skinparam defaultFontName Hack
+#+end_src
+
+* Autenticação
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_autenticacao.png
+  <<plantConfig>>
+
+  ' Ordens das entidades
+  actor "Cliente_não_autenticado" as clator
+  boundary Aplicação_Cliente as apliente
+  participant Cliente
+
+  ' Conexões
+  clator -> apliente: credenciais inseridas
+  activate apliente
+  apliente -> Cliente: checar_credenciais()
+  activate Cliente
+
+  alt credenciais aceitas
+
+  Cliente --> apliente: estado de login
+  clator <-- apliente: cliente autenticado
+
+  else credenciais negadas
+
+  Cliente --> apliente: estado de erro
+  deactivate Cliente
+  apliente -> clator: realizar nova tentativa
+  deactivate apliente
+
+  end
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram_autenticacao.png]]
+
+* Cadastro
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_cadastro.png
+  <<plantConfig>>
 
   ' Ordens de entidades
   actor Atendente
   boundary Aplicação_Atendente as apendente
   participant Cliente
   boundary Aplicação_Cliente as apliente
-  actor Cliente as clator
+  actor "Cliente_não_autenticado" as clator
 
   ' Conexões
+
   Atendente -> apendente: Insere dados
-  apendente -> Cliente: Cliente(nome,cadastro,cpf,cnh,data_nasc,tel)
-  deactivate Cliente
-  apliente <- clator: Cliente digita a senha
-  Cliente <- apliente: setSenha(senha)
+  activate apendente
+
+  alt nao-cadastrado
+
+        apendente -> Cliente: Cliente()
+        activate Cliente
+        apliente <- clator: Cliente digita a senha
+        activate apliente
+        Cliente <- apliente: setSenha()
+        deactivate apliente
+        apendente <-- Cliente: Credenciais recebidas
+        deactivate Cliente
+        Atendente <-- apendente: Cliente cadastrado
+
+  else cadastrado
+
+       Atendente <-- apendente: Cliente já cadastrado
+       deactivate apendente
+
+  end
 #+end_src
 
 #+RESULTS:
-[[file:./images/sequence_diagram.png]]
+[[file:./images/sequence_diagram_cadastro.png]]
+
+* Validação de documentos
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_valDoc.png
+  <<plantConfig>>
+
+  ' Ordens das entidades
+  actor "Cliente_autenticado" as clator
+  actor Atendente
+  boundary OCR
+
+  ' Conexões
+  clator <- Atendente: Solicita documentos
+  clator --> Atendente: Cede documentos
+  Atendente -> OCR: Insere documentos
+  activate OCR
+
+  alt documentos legalizados
+
+  Atendente <-- OCR: Documentos em dia
+  clator <-- Atendente: Devolve documentos
+
+  else documentos não-legalizados
+
+  Atendente <-- OCR: Documentos inválidos
+  deactivate OCR
+  clator <-- Atendente: Devolve documentos
+
+  end
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram_valDoc.png]]
+
+* Verificação de pendências
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_verPen.png
+  <<plantConfig>>
+
+  ' Ordens de entidades
+  actor Atendente
+  boundary Aplicação_Atendente as apendente
+  participant Cliente
+
+  ' Conexões
+  Atendente -> apendente: solicitar verificação de cliente
+  activate apendente
+  apendente -> Cliente: verificar_pendencias()
+  activate Cliente
+
+  alt sem pendências
+
+      apendente <-- Cliente: não há pendências
+      Atendente <-- apendente: liberado a prosseguir
+
+  else com pendências
+
+      apendente <-- Cliente: há pendências
+      deactivate Cliente
+      Atendente <-- apendente: solicitar resolução de pendências
+      deactivate apendente
+
+  end
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram_verPen.png]]
+
+* Locação presencial
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_locaPres.png
+  <<plantConfig>>
+
+  ' Ordens de entidades
+  actor Atendente
+  boundary Aplicação_Atendente as apendente
+  participant Cliente
+  participant Patio
+  boundary Aplicação_Cliente as apliente
+  actor "Cliente_autenticado" as clator
+  participant Atendimento
+  participant HistoricoAtendimentos
+
+  ' Conexões
+  clator -> apliente: Checar lista de veículos
+  activate apliente
+  apliente -> Patio: listar_veiculos()
+  activate Patio
+  Patio --> apliente: Retorna lista
+  clator -> apliente: Escolhe veículo
+  apliente -> Patio: verificar_disp()
+
+  alt veículo disponível
+
+      Patio --> apliente: Ok
+      apliente --> clator: Veículo selecionado
+      deactivate apliente
+
+  else veículo não-disponível
+
+      Patio -> apendente: Veículo não-disponível solicitado
+      deactivate Patio
+      activate apendente
+      apendente -> Atendente: Aplicar upgrade de categoria
+
+  end
+
+  Atendente -> apendente: Solicitar verificação de promoções
+  apendente -> Cliente: verificar_promocoes()
+  activate Cliente
+
+  alt há promoções
+
+      Cliente --> apendente: retorna de promoções elegíveis
+      apendente --> Atendente: cliente elegível
+
+  else não há promoções
+
+      Cliente --> apendente: retorna lista vazia
+      deactivate Cliente
+      apendente --> Atendente: cliente não-elegível
+
+  end
+
+  apendente -> Atendimento: cria atendimento
+  activate Atendimento
+  apendente -> Atendimento: calcular_valor()
+  Atendimento --> apendente: valor do atendimento
+  deactivate Atendimento
+  clator -> Atendente: selecionar método de pagamento
+  Atendente -> apendente: inicia pagamento
+  Atendente -> apendente: aplica promoções
+
+  alt cartão de crédito
+
+      Atendente -> clator: solicita cartão de crédito
+      clator --> Atendente: fornece cartão
+      Atendente -> apendente: insere cartão no sistema
+      apendente --> Atendente: solicita senha
+      Atendente -> clator: entrega terminal para digitar senha
+      clator --> Atendente: senha digitada
+      Atendente -> apendente: senha inserida
+      apendente --> Atendente: nota fiscal emitida
+      Atendente -> clator: entrega nota fiscal
+
+  else PIX
+
+      Atendente -> apendente: solicita qr code para pagamento
+      apendente --> Atendente: qr code gerado
+      Atendente -> clator: entrega qr code
+      clator --> apendente: pagamento realizado
+      apendente --> Atendente: nota promissória gerada
+      Atendente -> clator: entrega nota
+
+  end
+
+  apendente -> HistoricoAtendimentos: adicionar_atendimento()
+  deactivate apendente
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram_locaPres.png]]
+
+* Liberação do veículo
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_libVei.png
+  <<plantConfig>>
+
+  ' Ordens de entidades
+  actor "Time do pátio" as patime
+  boundary Aplicação_Time_Pátio as apatime
+  actor "Cliente-autenticado" as clator
+  participant Veiculo
+  participant Atendimento
+
+  ' Conexões
+  patime -> patime: busca veículo
+  patime -> patime: manobra veículo
+  patime -> clator: entrega veículo
+  patime -> apatime: atualiza status do atendimento
+  activate apatime
+  apatime -> Veiculo: setAlugado()
+  apatime -> Atendimento: setHorario_coleta()
+  deactivate apatime
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram_libVei.png]]
+
+* Coleta do veículo
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_colVei.png
+  <<plantConfig>>
+
+  ' Ordens de entidades
+  actor "Time do pátio" as patime
+  boundary Aplicação_Time_Pátio as apatime
+  actor "Cliente-não-autenticado" as clator
+  participant Patio
+  participant Veiculo
+  participant Atendimento
+
+  ' Conexões
+  clator -> patime: devolve veículo
+  patime -> patime: verifica veículo
+
+  alt pertences encontrados
+
+      patime -> clator: devolve pertences
+
+  end
+
+  alt veículo danificado
+
+      patime -> patime: aciona seguro
+      patime -> apatime: solicitar remoção de veículo
+      activate apatime
+      apatime -> Patio: remover_veiculo()
+      apatime --> patime: veículo removido
+
+  else veículo não-danificado
+
+      patime -> patime: estacionar veículo
+      patime -> apatime: solicitar baixa de devolução
+      apatime -> Veiculo: setAlugado()
+      apatime --> patime: status de veículo atualizado
+
+  end
+
+  apatime -> Atendimento: setHorario_devolucao()
+  activate Atendimento
+  apatime -> Atendimento: setEm_andamento()
+	deactivate Atendimento
+  deactivate apatime
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram_colVei.png]]
+
+* Locação online
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_locOn.png
+  <<plantConfig>>
+
+  ' Ordens de entidades
+  actor Time_pátio as patime
+  participant OCR
+  actor Atendente_portal as aportal
+  boundary Aplicação_Atendente as apendente
+  boundary Portal_Cliente as apliente
+  participant Cliente
+  actor Cliente_autenticado as clator
+  participant Patio
+  participant Atendimento
+  participant HistoricoAtendimentos
+
+  ' Conexões
+  clator -> apliente: inserir credenciais
+  activate apliente
+  apliente -> Cliente: checar_credenciais()
+  activate Cliente
+  Cliente --> apliente: credenciais aceitas
+  apliente --> clator: autenticado com sucesso
+  apliente -> apendente: solicitar verificações
+  activate apendente
+  apendente -> aportal: documentos
+  aportal -> OCR: verifica documentos
+  activate OCR
+
+  alt documentos legalizados
+
+      aportal <-- OCR: Documentos em dia
+      aportal --> apendente: confirma documentos
+      apendente --> apliente: liberado a prosseguir
+
+  else documentos não-legalizados
+
+      aportal <-- OCR: Documentos inválidos
+      deactivate OCR
+      aportal --> apendente: recusa documentos
+      apendente --> apliente: impedido de prosseguir
+
+  end
+
+  apendente -> Cliente: verificar_pendencias()
+
+  alt sem pendências
+
+      apendente <-- Cliente: Não há pendências
+      apliente <-- apendente: Liberado a prosseguir
+
+  else com pendências
+
+      apendente <-- Cliente: Há pendências
+      apliente <-- apendente: Solicitar resolução de pendências
+      deactivate apendente
+
+  end
+
+  clator -> apliente: Checar lista de veículos
+  apliente -> Patio: listar_veiculos()
+  activate Patio
+  Patio --> apliente: Retorna lista
+  clator -> apliente: Escolhe veículo
+  apliente -> Patio: verificar_disp()
+
+  alt veículo disponível
+
+      Patio --> apliente: Ok
+      apliente --> clator: Veículo selecionado
+
+  else veículo não-disponível
+
+      Patio --> apliente: Veículo não-disponível solicitado
+      deactivate Patio
+      apliente -> apliente: Aplicar upgrade de categoria
+
+  end
+
+  apliente -> Cliente: verificar_promocoes()
+
+  alt há promoções
+
+      Cliente --> apliente: retorna de promoções elegíveis
+
+  else não há promoções
+
+      Cliente --> apliente: retorna lista vazia
+      deactivate Cliente
+
+  end
+
+  apliente -> Atendimento: cria atendimento
+  activate Atendimento
+  apliente -> Atendimento: calcular_valor()
+  Atendimento --> apliente: valor do atendimento
+  deactivate Atendimento
+
+  clator -> apliente: selecionar método de pagamento
+  apliente -> apliente: aplica promoções
+
+  alt cartão de crédito
+
+      apliente -> clator: solicita credenciais
+      clator --> apliente: credenciais
+      apliente -> apliente: realiza pagamento
+      apliente --> clator: nota fiscal emitida
+
+  else PIX
+
+      apliente -> clator: qr code gerado
+      clator -> clator: realiza pagamento
+      clator --> apliente: pagamento realizado
+      apliente --> clator: nota promissória gerada
+
+  end
+
+  apliente -> patime: notifica reserva
+
+  apliente -> HistoricoAtendimentos: adicionar_atendimento()
+  deactivate apliente
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram_locOn.png]]
+
+* Categorização do atendente
+#+begin_src plantuml :noweb yes :file ./images/sequence_diagram_catAten.png
+  <<plantConfig>>
+
+  ' Ordens de entidades
+  actor Atendente as atentor
+  boundary Aplicação_Atendente as apendente
+  participant Atendente
+  participant Cliente
+
+  ' Conexões
+  atentor -> apendente: solicitar eleição de atendente
+  activate apendente
+  apendente -> Cliente: verificar_historico()
+  activate Cliente
+  Cliente --> apendente: média de valores de aluguéis
+  deactivate Cliente
+  apendente -> Atendente: compareceu() para todos atendentes
+  activate Atendente
+  Atendente --> apendente: lista de atendentes disponíveis
+  apendente -> Atendente: calcular_rendimento() para todos retornados
+
+  alt cliente com média baixa
+
+      Atendente --> apendente: atendente com maior rendimento
+
+  else cliente com média alta
+
+      Atendente --> apendente: atendente com menor rendimento
+      deactivate Atendente
+
+  end
+
+  apendente --> atentor: atendente selecionado
+  deactivate apendente
+#+end_src
+
+#+RESULTS:
+[[file:./images/sequence_diagram_catAten.png]]

@@ -6,6 +6,7 @@
   skinparam classAttributeIconSize 12
   skinparam defaultFontSize 16
   skinparam defaultFontName Hack
+  skinparam linetype ortho
   hide circle
 
   class "**Cliente**" as Cliente
@@ -13,7 +14,6 @@
   class "**Patio**" as Patio
   class "**Funcionario**" as Funcionario
   class "**Atendente**" as Atendente
-  class "**FuncPatio**" as FuncPatio
   class "**HistoricoAtendimentos**" as HistoricoAtendimentos
   class "**Atendimento**" as Atendimento
 
@@ -26,6 +26,7 @@
         -data_nasc : timestamp
         +verificar_promocoes() : string
         +verificar_pendencias() : bool
+          +verificar_historico() : float
   }
   class Veiculo {
         -id : string
@@ -50,15 +51,13 @@
         -cpf : string
         -inic_periodo : timestamp
         -fim_periodo : timestamp
+          -bateu_ponto : bool
         +bater_ponto() : void
+        +compareceu() : bool
   }
   class Atendente {
         -portal : bool
         +calcular_rendimento() : float
-  }
-  class FuncPatio {
-        -num_cnh : string
-        -categoria_cnh : int
   }
   class HistoricoAtendimentos {
         -qt_atendimentos : int
@@ -76,15 +75,14 @@
         +calcular_valor() : float
   }
 
-  Patio "1..1" o-down- "0..*" Veiculo : contém
-  Patio .right. FuncPatio : trabalha
+  Patio "1..1" o-left- "0..*" Veiculo : contém\t
+  Patio .right. Funcionario : trabalha
   Funcionario <|-- Atendente
-  Funcionario <|-- FuncPatio
   Atendente .. Cliente : atende
-  Cliente .right. Atendimento : participa
-  Veiculo .right. Cliente : aluga
+  Veiculo .down. Cliente : aluga
   Atendente "1..1" *-right- "1..1" HistoricoAtendimentos : possui
-  HistoricoAtendimentos "1..1" *-down- "0..*" Atendimento : contém
+  Cliente "1..1" *-right- "1..1" HistoricoAtendimentos : possui\t\t
+  HistoricoAtendimentos "1..1" *-right- "0..*" Atendimento : contém\t\t
 #+end_src
 
 #+RESULTS:
@@ -127,11 +125,6 @@
    para acesso do sistema, =telefone= para contato, =cpf= para seu registro, =inic_periodo=
    e =fim_periodo= controlados pelo método =bater_ponto=. O sistema realiza checagens
    se tal funcionário começou seu turno atrasado. 
-   
-** FuncPatio
-   Simboliza um funcionário do pátio, cuja classe mãe seria =Funcionario=. Este
-   funcionário é registrado com sua habilitação e a categoria (B, C ou BC ) desta.
-
    
 ** Atendente
    Atendente, cuja superclasse é Funcionário, tem um valor =portal= que representa
