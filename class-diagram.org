@@ -124,16 +124,23 @@
    Classe que representa um funcionário qualquer da empresa com =nome=, =id=, =senha=
    para acesso do sistema, =telefone= para contato, =cpf= para seu registro, =inic_periodo=
    e =fim_periodo= controlados pelo método =bater_ponto=. O sistema realiza checagens
-   se tal funcionário começou seu turno atrasado. 
+   se tal funcionário começou seu turno atrasado. O método =compareceu= simplesmente
+   verifica se este funcionário bateu ponto e está elegível para atender novos
+   clientes. 
+   
    
 ** Atendente
    Atendente, cuja superclasse é Funcionário, tem um valor =portal= que representa
-   se este mantém o portal /online/ ou não.
+   se este mantém o portal /online/ ou não. =calcular_rendimento= verifica a
+   /performance/ do =Atendendente= retornando uma média de valor de suas vendas
+   no mês. 
 
 ** HistoricoAtendimentos
    Existe para cada =Atendente=, este histórico lista a =qt_atendimentos=
    e =valor_vendas=, possibilitando o cálculo do desempenho do =Atendente=
-   em foco rapidamente. 
+   em foco rapidamente. A função =adicionar_atendimento= simplesmente
+   adiciona um novo atendimento realizado por um dos atendentes relacionado
+   a um =Cliente= específico. 
    
 ** Atendimento
    Possuindo um =valor= para o aluguel calculado pelo método =calcular_valor= e
