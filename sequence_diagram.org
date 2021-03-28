@@ -154,6 +154,7 @@
   boundary Aplicação_Atendente as apendente
   participant Cliente
   participant Patio
+  participant Veiculo
   boundary Aplicação_Cliente as apliente
   actor "Cliente_autenticado" as clator
   participant Atendimento
@@ -167,6 +168,10 @@
   Patio --> apliente: Retorna lista
   clator -> apliente: Escolhe veículo
   apliente -> Patio: verificar_disp()
+  Patio -> Veiculo: isAlugado()
+  activate Veiculo
+  Veiculo --> Patio: retorna status do veiculo
+  deactivate Veiculo
 
   alt veículo disponível
 
@@ -187,19 +192,29 @@
   apendente -> Cliente: verificar_promocoes()
   activate Cliente
 
-  alt há promoções
+  alt faz aniversário ou fidelizado
 
-      Cliente --> apendente: retorna de promoções elegíveis
-      apendente --> Atendente: cliente elegível
+      alt já recebeu upgrade
 
-  else não há promoções
+          Cliente -> Cliente: não faz nada
 
-      Cliente --> apendente: retorna lista vazia
-      deactivate Cliente
-      apendente --> Atendente: cliente não-elegível
+      else não recebeu ainda
+
+           Cliente -> Cliente: adiciona upgrade na lista
+      end
+
+  else está no top 10 clientes
+
+       Cliente -> Cliente: adiciona 12.5% de desconto na lista
+
+  else prazo mensal ou quinzenal
+
+       Cliente -> Cliente: adiciona 6% de desconto na lista
 
   end
 
+  Cliente --> apendente: retorna lista de promoções
+  deactivate Cliente	
   apendente -> Atendimento: cria atendimento
   activate Atendimento
   apendente -> Atendimento: calcular_valor()
@@ -326,6 +341,7 @@
   participant Cliente
   actor Cliente_autenticado as clator
   participant Patio
+  participant Veiculo
   participant Atendimento
   participant HistoricoAtendimentos
 
@@ -378,6 +394,10 @@
   Patio --> apliente: Retorna lista
   clator -> apliente: Escolhe veículo
   apliente -> Patio: verificar_disp()
+  Patio -> Veiculo: isAlugado()
+  activate Veiculo
+  Veiculo --> Patio: retorna status do veiculo
+  deactivate Veiculo
 
   alt veículo disponível
 
@@ -394,17 +414,29 @@
 
   apliente -> Cliente: verificar_promocoes()
 
-  alt há promoções
+  alt faz aniversário ou fidelizado
 
-      Cliente --> apliente: retorna de promoções elegíveis
+      alt já recebeu upgrade
 
-  else não há promoções
+          Cliente -> Cliente: não faz nada
 
-      Cliente --> apliente: retorna lista vazia
-      deactivate Cliente
+      else não recebeu ainda
+
+           Cliente -> Cliente: adiciona upgrade na lista
+      end
+
+  else está no top 10 clientes
+
+       Cliente -> Cliente: adiciona 12.5% de desconto na lista
+
+  else prazo mensal ou quinzenal
+
+       Cliente -> Cliente: adiciona 6% de desconto na lista
 
   end
 
+  Cliente --> apliente: retorna lista de promoções
+  deactivate Cliente		  
   apliente -> Atendimento: cria atendimento
   activate Atendimento
   apliente -> Atendimento: calcular_valor()
