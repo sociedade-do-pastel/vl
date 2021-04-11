@@ -1,5 +1,5 @@
 * Diagrama de caso de uso
-  #+begin_src plantuml :file images/caso_de_uso.png
+  #+begin_src plantuml :eval no-export :file images/caso_de_uso.png
     left to right direction
     skinparam packageStyle rectangle
 

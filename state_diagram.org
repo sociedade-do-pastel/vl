@@ -1,0 +1,170 @@
+#+title: Diagramas de Estados
+
+#+name: plantConfig
+#+begin_src plantuml :eval no-export
+  ' Configurações
+    scale 1.5
+    skinparam roundcorner 20
+    skinparam classAttributeIconSize 12
+    skinparam defaultFontSize 16
+    skinparam defaultFontName Hack
+    hide empty description
+#+end_src
+
+* Diagramas de estados
+** Veiculo
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/state_diagram_veiculo.png"
+  <<plantConfig>>
+
+  state "Não-alugado" as nAlugado
+  state "Indisponível" as indi
+  state "Devolução" as emdev
+
+  [*] --> nAlugado
+  nAlugado -right-> Alugado: [se requisitado] /\n veículo selecionado pelo cliente
+  nAlugado -left-> Reservado: [se reservado pelo portal] /\n veículo selecionado online 
+  nAlugado --> indi: [se veículo apresenta irregularidades] /\n veículo retirado da lista
+  indi --> nAlugado: [se regularizado] /\n veículo consertado
+  Alugado -down-> emdev: [fim do tempo de aluguel] /\n cliente realiza devolução
+  Reservado --> [*]
+  emdev --> [*]
+
+  Alugado: do / setAlugado()
+  Reservado: do / setReservado()
+  emdev: do / setAlugado()
+#+end_src
+
+#+RESULTS:
+[[file:./images/state_diagram_veiculo.png]]
+** Patio
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/state_diagram_patio.png"
+  <<plantConfig>>
+
+  [*] --> SaidaVeiculo : Veiculo reservado ou alugado
+
+  SaidaVeiculo --> EntregandoCliente : [se veiculo em condicoes] /\n Entregar
+
+  [*] --> ChegadaVeiculo : Entrada de veiculo
+  ChegadaVeiculo --> VerificandoVeiculo : realizar checkup
+  VerificandoVeiculo --> RegistrandoVeiculo : [se veiculo novo ou recém consertado] /\n Adicionar nos registros
+  VerificandoVeiculo --> AcionandoSeguro : [se veiculo apresenta defeitos] /\n Remover dos registros temporariamente
+  VerificandoVeiculo --> Estacionando : [se veiculo entregue] /\n Atualizar vagas
+
+  EntregandoCliente: do / setQt_vagas_ocupadas()
+  EntregandoCliente --> [*]
+  Estacionando : do / setQt_vagas_ocupadas
+  Estacionando --> [*]
+  AcionandoSeguro: do / remover_veiculo()
+  AcionandoSeguro: exit / setQt_vagas_ocupadas()
+  AcionandoSeguro --> [*]
+  RegistrandoVeiculo : do / adicionar_veiculo()
+  RegistrandoVeiculo : exit / set_Qt_vagas_ocupadas()
+  RegistrandoVeiculo --> [*]
+#+end_src
+
+#+RESULTS:
+[[file:./images/state_diagram_patio.png]]
+
+** Funcionario
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/state_diagram_funcionario.png"
+  <<plantConfig>>
+  [*] --> BatendoPonto : Funcionario entra no predio
+  BatendoPonto: entry / bater_ponto()
+  BatendoPonto: do / setBateu_ponto()
+  BatendoPonto --> EmExpediente : [se periodo < (inic_periodo + 10)] /\n Prosseguir para o trabalho
+  BatendoPonto --> Atrasado: [se periodo >= (inic_periodo + 10)] /\n Funcionario consulta RH
+  Atrasado --> EmExpediente : [se RH liberar funcionario] /\n Funcionario tem salario descontado
+  EmExpediente --> [*]: Funcionario terminou suas tarefas
+#+end_src
+
+#+RESULTS:
+[[file:./images/state_diagram_funcionario.png]]
+
+** Atendente
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/state_diagram_atendente.png"
+  <<plantConfig>>
+
+  [*] --> VerificandoRendimento : Chegada de um cliente
+  VerificandoRendimento : do / calcular_rendimento()
+  VerificandoRendimento --> Atendendo : [se rendimento condiz] /\n Prosseguir
+  Atendendo --> [*]
+#+end_src
+
+#+RESULTS:
+#+attr_latex: :scale 0.4
+[[file:./images/state_diagram_atendente.png]]
+
+** HistoricoAtendimentos
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/state_diagram_histAten.png"
+  <<plantConfig>>
+
+  state "Criação" as cria
+
+  [*] --> cria: novo atendente
+  cria --> NovoAtendimento: [se recebe cliente]
+  NovoAtendimento --> [*]
+
+  NovoAtendimento: do / adicionar_atendimento()
+  NovoAtendimento: do / setQt_atendimentos()
+  NovoAtendimento: do / setValor_vendas()
+#+end_src
+
+#+RESULTS:
+#+attr_latex: :scale 0.4
+[[file:./images/state_diagram_histAten.png]]
+
+** Atendimento
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/state_diagram_atendimento.png"
+  <<plantConfig>>
+
+  state "Criação" as cria
+  state "Coleta do veículo" as Coleta
+  state "Devolução do veículo" as Devol
+
+  [*] -right-> cria: novo atendimento
+  cria : do / setId_atendente()
+  cria : do / setId_cliente()
+  cria : do / setId_veiculo()
+  cria : exit / setEm_andamento()
+
+  cria -right-> Pagamento: pronto para pagamento 
+  Pagamento: do / calcular_valor()
+
+  Pagamento --> Coleta: [se pagamento realizado] /\n cliente coleta veículo
+  Coleta: do / setHorario_coleta()
+
+  Coleta -left-> Devol: [se veículo devolvido] /\n cliente entrega o veículo
+  Devol: do / setHorario_devolucao()
+  Devol: exit / setEm_andamento()
+
+  Devol -left-> [*]
+#+end_src
+
+#+RESULTS:
+[[file:./images/state_diagram_atendimento.png]]
+
+** Cliente
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/state_diagram_cliente.png"
+  <<plantConfig>>
+
+  [*] --> ChecandoCadastro : Cliente atendido
+  ChecandoCadastro : entry / checar_credenciais()
+  ChecandoCadastro --> Falha : [se falso] /\n Reter cliente
+  ChecandoCadastro -right-> Avaliando : [se verdadeiro] /\n Prosseguir para avaliação
+
+  Avaliando: entry / verificar_pendencias()
+  Avaliando: do / verificar_historico()
+  Avaliando: do / verificar_promocoes()
+  Avaliando --> Quitando : \n[se hão pendências] /\n Reter cliente
+  Quitando --> Alugando : [se resolvidas pendências] /\n Prosseguir para aluguel
+  Quitando --> Falha : [se não resolvidas pendências] /\n Reter cliente
+
+  Falha -> Falha : [enquanto não forem \n resolvidos problemas]
+  Falha --> Alugando : [se resolvidos problemas]
+  Avaliando --> Alugando : [se não hão pendências] /\n Prosseguir para aluguel \ncom atendente escolhido
+  Alugando --> [*]
+
+#+end_src
+
+#+RESULTS:
+[[file:./images/state_diagram_cliente.png]]

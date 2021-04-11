@@ -13,3 +13,5 @@
 
 #+include: ../sequence_diagram.org
 
+#+include: ../state_diagram.org
+

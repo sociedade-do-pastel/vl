@@ -1,6 +1,6 @@
 * Diagrama
 
-#+begin_src plantuml :file images/class_diagram.png
+#+begin_src plantuml :eval no-export :file images/class_diagram.png
   scale 1.5
   skinparam roundcorner 20
   skinparam classAttributeIconSize 12
@@ -34,6 +34,7 @@
         -ano : string
         -categoria : int
         -alugado : bool
+        -reservado : bool
   }
   class Patio {
         -qt_vagas : int
