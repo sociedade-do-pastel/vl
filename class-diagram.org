@@ -1,4 +1,4 @@
-* Diagrama
+* Diagrama de classe
 
 #+begin_src plantuml :eval no-export :file images/class_diagram.png
   scale 1.5
