@@ -15,3 +15,5 @@
 
 #+include: ../state_diagram.org
 
+* Diagrama de atividades
+#+include: ../activities_diagram.org

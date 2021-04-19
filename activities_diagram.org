@@ -1,0 +1,182 @@
+#+title: Diagrama de atividades
+
+#+name: plantConfig
+#+begin_src plantuml :eval no-export
+  ' Configurações
+    scale 1.5
+    skinparam roundcorner 20
+    skinparam classAttributeIconSize 12
+    skinparam defaultFontSize 16
+    skinparam defaultFontName Hack
+#+end_src
+
+* Cálculo do preço
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/activities_diagram_price.png"
+  <<plantConfig>>
+
+  start
+  :Chamado calcular_valor(promocoes);
+  :categoria_escolhida = obter categoria do veículo;
+  :categoria_recebida = categoria_escolhida;
+
+  :desconto = 0;
+
+  :Obtido prazo;
+
+  if (prazo quinzenal ou mensal) then (sim)
+     :desconto += 0.06;
+  else (não)
+  endif
+
+  if (TOP10 clientes do mês) then (sim)
+     :desconto += 0.125;
+  else (não)
+  endif
+
+  if (cliente aniversariante) then (sim)
+     :call \nupgrade_de_categoria>
+  else (não)
+       if (cliente fidelizado) then (sim)
+          :call \nupgrade_de_categoria>
+       else (não)
+       endif
+  endif
+
+  :preco_base = obter preço de categoria escolhida;
+  :preco_final = preco_base * (1-desconto) + taxa * qt_dias;
+
+  note left
+  a taxa é calculada a partir
+  dos custos de manutenção dos
+  veículos, estabelecimento
+  e taxas governamentais, portanto,
+  é redefinida sob demanda
+  end note
+
+  end
+
+  partition upgrade_de_categoria {
+  if (já recebeu upgrade previamente) then (sim)
+  else (não)
+       :categoria_recebida++;
+    endif
+  }
+#+end_src
+
+#+RESULTS:
+#+attr_latex: :scale 0.3
+[[file:./images/activities_diagram_price.png]]
+
+* Escolha do atendente
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/activities_diagram_aten.png"
+  <<plantConfig>>
+
+  start
+  :solicitada eleição do atendente;
+  :media_valores = cliente.verificar_historico();
+  :rendimento = 0;
+
+  if (media_valores) then (alta)
+      :media_temp = inf;
+  else (baixa)
+      :media_temp = 0;   
+  endif
+
+  :atendente_escolhido = null;
+  :checar lista de atendentes;
+
+  repeat
+  if (atendente.compareceu()) then (sim)
+     if (media_valores) then (alta)
+        :call buscar_menor>
+     else (baixa)
+        :call buscar_maior>
+     endif
+  else (não)
+  endif
+  repeatwhile (lista vazia) is (não) not (sim)
+  :return atendente_escolhido;
+  end
+
+  partition buscar_maior {
+      if (atendente.calcular_rendimento() > media_temp) then (true)
+          :media_temp = atendente.calcular_rendimento();
+          :atendente_escolhido = atendente;
+      endif
+      end
+  }
+
+  partition buscar_menor {
+      if (atendente.calcular_rendimento() < media_temp) then (true)
+          :media_temp = atendente.calcular_rendimento();
+          :atendente_escolhido = atendente;
+      endif
+      end
+  }
+#+end_src
+
+#+RESULTS:
+#+attr_latex: :scale 0.3
+[[file:./images/activities_diagram_aten.png]]
+
+* Autenticação/cadastro
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/activities_diagram_autent.png"
+  <<plantConfig>>
+
+  start
+  :interação com a interface;
+  if (possui cadastro) then (sim)
+      :call autenticar>
+  else (não)
+      :call cadastro>
+      :call autenticar>
+  endif
+  end
+
+  partition autenticar {
+      :inserir credenciais;
+      :tentativas = 3;
+      :estado = null;
+      repeat 
+      if (checar_credenciais()) then (true)
+          :estado = login;
+      else (false)
+          :tentativas--;
+          :estado = falha;
+      endif
+      if (tentativas) then (0)
+          :break;
+          :call cadastro>
+          end
+      else (!=0)
+      endif
+      repeatwhile (estado) is (falha) not (login)
+      end
+  }
+
+  partition cadastro {
+      :tentativas = 3; 
+      repeat
+      :cliente insere dados e senha;
+      :cliente insere novamente;
+      if (dados) then (incorretos)
+          :tentativas--;
+      else (corretos)
+      endif
+      if (tentativas) then (0)
+          :break;
+      else (!= 0)
+      endif
+      repeatwhile (dados) is (incorreto) not (correto)
+      if (Cliente()) then (não existe);
+          :cadastrado com sucesso;
+          end
+      else (já existe)
+          end
+      endif
+  }
+#+end_src
+
+#+RESULTS:
+#+attr_latex: :scale 0.235
+[[file:./images/activities_diagram_autent.png]]
