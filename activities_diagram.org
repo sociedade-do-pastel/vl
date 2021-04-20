@@ -77,9 +77,23 @@
   :rendimento = 0;
 
   if (media_valores) then (alta)
-      :media_temp = inf;
+
+  note left
+  Clientes com médias de valores altas
+  serão redirecionados para um atendente
+  com média baixa, assim como um atendente
+  de alto rendimento será escolhido para
+  um cliente com média baixa.
+  Os valores de media_temp servem para
+  comparação, se for alta será 0, pois
+  qualquer valor será maior, assim como
+  qualquer valor será menor do que
+  infinito para uma média baixa.
+  end note
+
+      :media_temp = 0;
   else (baixa)
-      :media_temp = 0;   
+      :media_temp = inf;   
   endif
 
   :atendente_escolhido = null;
@@ -116,6 +130,7 @@
 #+end_src
 
 #+RESULTS:
+[[file:./images/activities_diagram_aten.png]]
 #+attr_latex: :scale 0.3
 [[file:./images/activities_diagram_aten.png]]
 
