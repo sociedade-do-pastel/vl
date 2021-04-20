@@ -91,9 +91,9 @@
   infinito para uma média baixa.
   end note
 
-      :media_temp = 0;
+      :media_temp = inf;
   else (baixa)
-      :media_temp = inf;   
+      :media_temp = 0;   
   endif
 
   :atendente_escolhido = null;
@@ -130,8 +130,7 @@
 #+end_src
 
 #+RESULTS:
-[[file:./images/activities_diagram_aten.png]]
-#+attr_latex: :scale 0.3
+#+attr_latex: :scale 0.25
 [[file:./images/activities_diagram_aten.png]]
 
 * Autenticação/cadastro
