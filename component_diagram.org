@@ -1,0 +1,43 @@
+#+title: Diagrama de componentes
+
+#+name: plantConfig
+#+begin_src plantuml :eval no-export
+  ' Configurações
+    scale 1.5
+    skinparam roundcorner 20
+    skinparam classAttributeIconSize 12
+    skinparam defaultFontSize 16
+    skinparam defaultFontName Hack
+#+end_src
+
+#+begin_src plantuml :noweb yes :eval no-export :file "./images/component_diagram.png"
+  <<plantConfig>>
+
+  package "GUI" {
+      [AtendenteGUI]
+      [PatioGUI]
+      [ClienteGUI]
+  }
+
+  package "Web" {
+      [PortalCliente] - HTTPS
+      HTTPS - [ServidorWeb]
+  }
+
+  database "SQL" {
+      [Atendimentos]
+      [Atendentes]
+      [Clientes]
+      [Veiculos]
+  }
+
+  package "Libraries" {
+      [OCR] << shared lib >>
+      [API_Pagamento] << shared lib >>
+  }
+
+  [ServidorWeb] - [Clientes]
+#+end_src
+
+#+RESULTS:
+[[file:./images/component_diagram.png]]
