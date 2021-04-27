@@ -130,7 +130,6 @@
 #+end_src
 
 #+RESULTS:
-[[file:./images/activities_diagram_aten.png]]
 #+attr_latex: :scale 0.3
 [[file:./images/activities_diagram_aten.png]]
 
